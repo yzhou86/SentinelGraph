@@ -1,0 +1,17 @@
+{
+  "metadata": {
+    "uid": "network-0001",
+    "product": {"name": "demo-sensor", "vendor_name": "SentinelGraph"}
+  },
+  "time": "2026-08-10T09:05:00Z",
+  "class_uid": 4001,
+  "category_uid": 4,
+  "activity_id": 1,
+  "severity_id": 4,
+  "actor": {"user": {"uid": "u-alice", "name": "alice"}},
+  "src_endpoint": {"ip": "10.0.1.15"},
+  "dst_endpoint": {"ip": "198.51.100.9", "port": 4444},
+  "device": {"uid": "host-web-01", "hostname": "web-01"},
+  "connection_info": {"protocol_name": "https"},
+  "message": "Outbound TLS connection to unusual port"
+}

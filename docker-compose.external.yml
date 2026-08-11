@@ -1,0 +1,65 @@
+# Use this compose file when StarRocks is already operated elsewhere.
+# Example:
+#   docker compose -f docker-compose.external.yml run --rm bootstrap
+#   docker compose -f docker-compose.external.yml up --build api
+services:
+  bootstrap:
+    build: .
+    command:
+      - sh
+      - -ec
+      - |
+        if [ "$${ENABLE_VECTOR_INDEX:-true}" = "true" ]; then
+          python -m ocskg.cli bootstrap --vector-index
+        else
+          python -m ocskg.cli bootstrap
+        fi
+    environment:
+      STARROCKS_HOST: "${STARROCKS_HOST:?Set STARROCKS_HOST to the external FE hostname}"
+      STARROCKS_PORT: "${STARROCKS_PORT:-9030}"
+      STARROCKS_USER: "${STARROCKS_USER:-root}"
+      STARROCKS_PASSWORD: "${STARROCKS_PASSWORD:-}"
+      STARROCKS_DATABASE: "${STARROCKS_DATABASE:-security_lakehouse}"
+      STARROCKS_SSL_ENABLED: "${STARROCKS_SSL_ENABLED:-false}"
+      STARROCKS_SSL_VERIFY: "${STARROCKS_SSL_VERIFY:-true}"
+      STARROCKS_SSL_CA: "${STARROCKS_SSL_CA:-}"
+      VECTOR_SEARCH_ENABLED: "${VECTOR_SEARCH_ENABLED:-true}"
+      VECTOR_DIMENSION: "${VECTOR_DIMENSION:-64}"
+      ENABLE_VECTOR_INDEX: "${ENABLE_VECTOR_INDEX:-true}"
+      LLM_ENABLED: "${LLM_ENABLED:-false}"
+      LLM_API_BASE: "${LLM_API_BASE:-https://api.openai.com/v1}"
+      LLM_API_KEY: "${LLM_API_KEY:-}"
+      LLM_MODEL: "${LLM_MODEL:-}"
+      LLM_TIMEOUT_SECONDS: "${LLM_TIMEOUT_SECONDS:-45}"
+      INTEGRATION_API_KEYS: "${INTEGRATION_API_KEYS:-}"
+      RULES_PATH: /app/rules/default.yaml
+    restart: "no"
+
+  api:
+    build: .
+    environment:
+      STARROCKS_HOST: "${STARROCKS_HOST:?Set STARROCKS_HOST to the external FE hostname}"
+      STARROCKS_PORT: "${STARROCKS_PORT:-9030}"
+      STARROCKS_USER: "${STARROCKS_USER:-root}"
+      STARROCKS_PASSWORD: "${STARROCKS_PASSWORD:-}"
+      STARROCKS_DATABASE: "${STARROCKS_DATABASE:-security_lakehouse}"
+      STARROCKS_SSL_ENABLED: "${STARROCKS_SSL_ENABLED:-false}"
+      STARROCKS_SSL_VERIFY: "${STARROCKS_SSL_VERIFY:-true}"
+      STARROCKS_SSL_CA: "${STARROCKS_SSL_CA:-}"
+      VECTOR_SEARCH_ENABLED: "${VECTOR_SEARCH_ENABLED:-true}"
+      VECTOR_DIMENSION: "${VECTOR_DIMENSION:-64}"
+      DEMO_ENABLED: "${DEMO_ENABLED:-false}"
+      LLM_ENABLED: "${LLM_ENABLED:-false}"
+      LLM_API_BASE: "${LLM_API_BASE:-https://api.openai.com/v1}"
+      LLM_API_KEY: "${LLM_API_KEY:-}"
+      LLM_MODEL: "${LLM_MODEL:-}"
+      LLM_TIMEOUT_SECONDS: "${LLM_TIMEOUT_SECONDS:-45}"
+      INTEGRATION_API_KEYS: "${INTEGRATION_API_KEYS:-}"
+      RULES_PATH: /app/rules/default.yaml
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 20s
+      timeout: 5s
+      retries: 5

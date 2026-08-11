@@ -1,0 +1,9 @@
+-- Optional production stream ingress. The Kafka value must be normalized to the
+-- projected OCSF event columns by your connector or Flink job before loading.
+-- CREATE ROUTINE LOAD security_lakehouse.ocsf_events_routine ON ocsf_events
+-- COLUMNS(event_uid,event_time,event_date,ingest_time,class_uid,category_uid,type_uid,
+--         activity_id,severity_id,status_id,tenant_id,source_product,source_vendor,
+--         actor_user_uid,actor_user_name,src_ip,dst_ip,dst_port,protocol,device_uid,
+--         device_hostname,resource_uid,resource_name,cloud_account_uid,trace_id,message,raw_event)
+-- PROPERTIES ("desired_concurrent_number" = "3", "format" = "json")
+-- FROM KAFKA ("kafka_broker_list" = "kafka:9092", "kafka_topic" = "ocsf-normalized");

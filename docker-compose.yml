@@ -1,0 +1,53 @@
+services:
+  starrocks:
+    image: starrocks/allin1-ubuntu:latest
+    container_name: sentinelgraph-starrocks
+    ports:
+      - "8030:8030" # Web UI
+      - "9030:9030" # MySQL protocol
+    healthcheck:
+      test: ["CMD-SHELL", "mysql -h 127.0.0.1 -P 9030 -u root -e 'SELECT 1' >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+    volumes:
+      - starrocks-data:/data
+
+  bootstrap:
+    build: .
+    command: ["python", "-m", "ocskg.cli", "bootstrap", "--vector-index"]
+    environment: &ocskg_environment
+      STARROCKS_HOST: starrocks
+      STARROCKS_PORT: "9030"
+      STARROCKS_USER: root
+      STARROCKS_DATABASE: security_lakehouse
+      RULES_PATH: /app/rules/default.yaml
+      DEMO_ENABLED: "true"
+      LLM_ENABLED: "${LLM_ENABLED:-false}"
+      LLM_API_BASE: "${LLM_API_BASE:-https://api.openai.com/v1}"
+      LLM_API_KEY: "${LLM_API_KEY:-}"
+      LLM_MODEL: "${LLM_MODEL:-}"
+      LLM_TIMEOUT_SECONDS: "${LLM_TIMEOUT_SECONDS:-45}"
+      INTEGRATION_API_KEYS: "${INTEGRATION_API_KEYS:-}"
+    depends_on:
+      starrocks:
+        condition: service_healthy
+    restart: "no"
+
+  api:
+    build: .
+    environment: *ocskg_environment
+    depends_on:
+      bootstrap:
+        condition: service_completed_successfully
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  starrocks-data:
