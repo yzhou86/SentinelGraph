@@ -18,6 +18,7 @@ from pydantic import BaseModel, Field
 
 from . import mock
 from .adapters import SUPPORTED_SOURCE_FORMATS
+from .ai_security import assess_ai_security_flow, mock_ai_security_assessment
 from .config import get_settings
 from .llm import OpenAICompatibleClient
 from .repository import StarRocksRepository
@@ -117,6 +118,19 @@ class LLMTestRequest(BaseModel):
     timeout_seconds: int = Field(default=45, ge=1, le=300)
 
 
+class AISecurityAssessmentRequest(BaseModel):
+    """Assess a customer AI App/RAG/Agent interaction at the product boundary."""
+
+    tenant_id: str = Field(default="default", min_length=1, max_length=128)
+    app_id: str = Field(default="default-ai-app", min_length=1, max_length=128)
+    user_role: str = Field(default="user", min_length=1, max_length=128)
+    prompt: str = Field(default="", max_length=50_000)
+    rag_context: list[dict[str, Any]] = Field(default_factory=list, max_length=50)
+    tool_call: dict[str, Any] | None = None
+    model_output: str = Field(default="", max_length=50_000)
+    mode: DemoMode = "live"
+
+
 @lru_cache
 def get_service() -> SecurityGraphService:
     settings = get_settings()
@@ -140,6 +154,10 @@ app = FastAPI(
             "description": "Bounded historical behavior clustering and evidence-led post-analysis.",
         },
         {"name": "Text Graph", "description": "Reviewable text-to-graph enrichment."},
+        {
+            "name": "AI Security",
+            "description": "Customer AI App, RAG, and Agent guardrail assessment.",
+        },
     ],
 )
 STATIC_DIR = Path(__file__).parent / "static"
@@ -249,6 +267,13 @@ def integration_capabilities() -> dict[str, Any]:
             "retrospective_analysis": True,
             "text_to_graph": True,
             "agent_investigation": True,
+            "ai_security": {
+                "input_guardrails": True,
+                "rag_access_control": True,
+                "agent_tool_approval": True,
+                "data_loss_prevention": True,
+                "audit_chain": True,
+            },
             "mock_mode": True,
         },
     }
@@ -297,6 +322,25 @@ def test_llm(request: LLMTestRequest) -> dict[str, Any]:
         return OpenAICompatibleClient(settings).test()
     except Exception as error:
         raise HTTPException(status_code=422, detail=f"LLM connection failed: {error}") from error
+
+
+@app.post("/v1/ai-security/assessments", tags=["AI Security"])
+def assess_ai_security(request: AISecurityAssessmentRequest) -> dict[str, Any]:
+    """Assess customer AI App, RAG, and Agent traffic at the product boundary."""
+    if request.mode == "mock":
+        return {"mode": "mock", **mock_ai_security_assessment(request.tenant_id)}
+    return {
+        "mode": "live",
+        **assess_ai_security_flow(
+            tenant_id=request.tenant_id,
+            app_id=request.app_id,
+            user_role=request.user_role,
+            prompt=request.prompt,
+            rag_context=request.rag_context,
+            tool_call=request.tool_call,
+            model_output=request.model_output,
+        ),
+    }
 
 
 @app.post("/v1/events", status_code=202)
