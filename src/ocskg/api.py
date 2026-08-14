@@ -227,6 +227,12 @@ def project_guide_page() -> FileResponse:
     return FileResponse(STATIC_DIR / "guide.html")
 
 
+@app.get("/reference", include_in_schema=False)
+def developer_reference_page() -> FileResponse:
+    """Developer reference for Security for AI libraries and tools."""
+    return FileResponse(STATIC_DIR / "dev_reference.html")
+
+
 @app.get("/health")
 def health(mode: DemoMode = MODE_QUERY) -> dict[str, str]:
     if mode == "mock":

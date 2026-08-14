@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="SentinelGraph Security for AI 开发参考：类库、框架和工具选型。" />
+    <title>开发参考 · SentinelGraph</title>
+    <style>
+      :root { color-scheme: dark; --bg:#050817; --panel:#0a1430dc; --line:#305778; --cyan:#75e6ff; --violet:#b9a8ff; --lime:#a5f6bf; --pink:#ff9eac; --muted:#9caed0; font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; }
+      * { box-sizing:border-box; }
+      body { margin:0; color:#eaf2ff; background:radial-gradient(circle at 6% 0,#113b69 0,transparent 30rem),radial-gradient(circle at 92% 9%,#352171 0,transparent 30rem),var(--bg); line-height:1.66; }
+      body::before { content:""; position:fixed; z-index:-1; inset:0; opacity:.12; background-image:linear-gradient(#47739a 1px,transparent 1px),linear-gradient(90deg,#47739a 1px,transparent 1px); background-size:45px 45px; mask-image:linear-gradient(to bottom,#000,transparent 75%); }
+      a { color:var(--cyan); text-decoration:none; } a:hover { text-decoration:underline; }
+      .shell { width:min(1220px,calc(100% - 36px)); margin:auto; padding-bottom:70px; }
+      .top { display:flex; justify-content:space-between; align-items:center; gap:16px; padding:22px 0; }
+      .brand { font-weight:900; letter-spacing:-.04em; color:#eaf2ff; }.brand i { color:var(--cyan); font-style:normal; }
+      nav { display:flex; flex-wrap:wrap; gap:9px; } nav a { padding:8px 10px; border:1px solid #34597d; border-radius:9px; color:#c7daf6; font-size:.78rem; } nav a:hover { background:#13294a; text-decoration:none; }
+      .hero { padding:60px 0 36px; max-width:920px; }
+      .eyebrow { color:var(--cyan); font:800 .73rem/1 ui-monospace,SFMono-Regular,monospace; letter-spacing:.14em; }
+      h1 { margin:16px 0; font-size:clamp(2.6rem,6vw,5rem); line-height:.96; letter-spacing:-.07em; }
+      h1 span { color:transparent; background:linear-gradient(110deg,var(--cyan),var(--violet),var(--pink)); background-clip:text; }
+      .lead { max-width:800px; color:#b8c9e7; font-size:1.05rem; }
+      .toc { display:flex; flex-wrap:wrap; gap:8px; margin:24px 0 30px; }
+      .toc a, .tag { display:inline-block; padding:6px 8px; border:1px solid #416783; border-radius:999px; color:#c4d6ed; background:#09152c; font:700 .66rem/1 ui-monospace,SFMono-Regular,monospace; }
+      .section { margin-top:16px; padding:24px; border:1px solid var(--line); border-radius:17px; background:var(--panel); box-shadow:0 18px 60px #0003; backdrop-filter:blur(16px); }
+      .section h2 { margin:0 0 10px; font-size:1.42rem; letter-spacing:-.03em; }
+      .section h2 small { display:block; margin-bottom:6px; color:var(--cyan); font:800 .68rem/1 ui-monospace,SFMono-Regular,monospace; letter-spacing:.12em; }
+      .section p { color:#b7c7e3; font-size:.9rem; }
+      .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:14px; }
+      .tool { padding:16px; border:1px solid #294c6f; border-radius:12px; background:#071127b8; }
+      .tool h3 { margin:0 0 8px; font-size:1rem; }
+      .tool p { margin:7px 0; color:#adbfdb; font-size:.82rem; }
+      .tool ul { margin:9px 0 0; padding-left:18px; color:#b4c5df; font-size:.8rem; }
+      .tool li { margin:4px 0; }
+      .meta { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+      .meta .tag { border-radius:7px; }
+      .warning { border-color:#805666; background:linear-gradient(90deg,#3718279a,#0a1430dc); }
+      .warning b { color:#ffc8d1; }
+      footer { margin-top:34px; color:#8299be; font-size:.78rem; }
+      @media(max-width:780px){.top{align-items:flex-start;flex-direction:column}.grid{grid-template-columns:1fr}.hero{padding-top:40px}h1{font-size:2.8rem}.section{padding:20px}}
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="top">
+        <a class="brand" href="/">Sentinel <i>Graph</i> / 开发参考</a>
+        <nav aria-label="项目导航">
+          <a href="/">演示控制台</a>
+          <a href="/guide">项目文档</a>
+          <a href="/integrations">第三方 API</a>
+          <a href="/docs">Swagger</a>
+        </nav>
+      </header>
+
+      <section class="hero">
+        <div class="eyebrow">SECURITY FOR AI · LIBRARIES · TOOLING</div>
+        <h1>Security for AI<br /><span>类库与工具选型参考。</span></h1>
+        <p class="lead">本页把两个设计文档中提到的安全框架、类库和工具按产品能力归类，方便把 SentinelGraph 的 AI Security 控制面继续扩展为可接入、可治理、可审计的工程实现。</p>
+        <div class="toc">
+          <a href="#guardrails">输入/输出护栏</a>
+          <a href="#rag-agent">RAG 与 Agent</a>
+          <a href="#privacy">隐私与脱敏</a>
+          <a href="#robustness">对抗鲁棒性</a>
+          <a href="#alignment">对齐训练</a>
+          <a href="#selection">选型建议</a>
+        </div>
+      </section>
+
+      <section class="section" id="guardrails">
+        <h2><small>01 / GUARDRAILS</small>输入与输出安全护栏</h2>
+        <p>用于实现 prompt injection、jailbreak、有害输出、结构化输出和策略化阻断。适合接在 AI Gateway、RAG 编排层或 Agent 编排层之前。</p>
+        <div class="grid">
+          <article class="tool">
+            <h3><a href="https://github.com/meta-llama/PurpleLlama/tree/main/Llama-Guard3" target="_blank" rel="noreferrer">Llama Guard 3</a></h3>
+            <p>Meta 的输入/输出安全分类模型，适合把“是否违规、是否高风险”抽象成一个独立分类服务。</p>
+            <ul><li>对应 SentinelGraph：Prompt Gate、Output Gate。</li><li>适合：恶意指令、隐私泄露、有害内容和策略分类。</li><li>注意：需要模型部署、评测和本地策略映射。</li></ul>
+            <div class="meta"><span class="tag">Classifier</span><span class="tag">Input/Output</span></div>
+          </article>
+          <article class="tool">
+            <h3><a href="https://github.com/NVIDIA/NeMo-Guardrails" target="_blank" rel="noreferrer">NeMo Guardrails</a></h3>
+            <p>NVIDIA 的可编程护栏框架，用 Colang 定义对话流程、允许路径和阻断规则。</p>
+            <ul><li>对应 SentinelGraph：策略中心、AI Gateway。</li><li>适合：企业客服、Copilot、Agent 对话流约束。</li><li>注意：规则维护成本高，适合稳定业务场景。</li></ul>
+            <div class="meta"><span class="tag">Policy Flow</span><span class="tag">Colang</span></div>
+          </article>
+          <article class="tool">
+            <h3><a href="https://github.com/guardrails-ai/guardrails" target="_blank" rel="noreferrer">Guardrails AI</a></h3>
+            <p>面向 LLM 输出验证的 Python 框架，可做 JSON Schema、字段约束、重试和阻断。</p>
+            <ul><li>对应 SentinelGraph：结构化输出校验、Agent 调查结果约束。</li><li>适合：要求模型返回固定结构或合规字段的业务。</li><li>注意：输出验证不能替代输入侧注入检测。</li></ul>
+            <div class="meta"><span class="tag">Validation</span><span class="tag">Schema</span></div>
+          </article>
+          <article class="tool">
+            <h3><a href="https://github.com/whylabs/langkit" target="_blank" rel="noreferrer">LangKit</a></h3>
+            <p>WhyLabs 的 LLM 监控与文本质量工具，覆盖提示词质量、毒性、相似度和注入相关信号。</p>
+            <ul><li>对应 SentinelGraph：AI Security Telemetry。</li><li>适合：离线扫描、监控指标、风险趋势分析。</li><li>注意：更偏观测和特征，不是完整审批流。</li></ul>
+            <div class="meta"><span class="tag">Monitoring</span><span class="tag">Signals</span></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="rag-agent">
+        <h2><small>02 / RAG + AGENT</small>RAG 与 Agent 执行安全</h2>
+        <p>用于把企业知识库权限、上下文隔离、工具执行审批和沙箱运行落到工程系统里。</p>
+        <div class="grid">
+          <article class="tool">
+            <h3><a href="https://e2b.dev/" target="_blank" rel="noreferrer">E2B Sandbox</a></h3>
+            <p>面向 AI Agent 的云端沙箱，提供隔离的代码执行环境。</p>
+            <ul><li>对应 SentinelGraph：Agent Runtime Sandbox。</li><li>适合：Python/JS 代码执行器、文件分析、临时工具运行。</li><li>注意：高危动作仍应接审批和审计。</li></ul>
+            <div class="meta"><span class="tag">Sandbox</span><span class="tag">Agent</span></div>
+          </article>
+          <article class="tool">
+            <h3><a href="https://python.langchain.com/" target="_blank" rel="noreferrer">LangChain</a></h3>
+            <p>常见 LLM/Agent 编排框架，可在链路中挂接 SentinelGraph 的评估 API、审计和审批。</p>
+            <ul><li>对应 SentinelGraph：SDK / Gateway 集成。</li><li>适合：已有 LangChain Agent 或工具链项目。</li><li>注意：工具权限和 RAG 过滤不要只靠 prompt 声明。</li></ul>
+            <div class="meta"><span class="tag">Orchestration</span><span class="tag">Agent</span></div>
+          </article>
+          <article class="tool">
+            <h3><a href="https://www.llamaindex.ai/" target="_blank" rel="noreferrer">LlamaIndex</a></h3>
+            <p>RAG 和数据连接框架，可把租户、角色、部门等元数据过滤下沉到检索层。</p>
+            <ul><li>对应 SentinelGraph：RAG Access Control。</li><li>适合：企业知识库、文档检索、索引治理。</li><li>注意：必须强制 metadata filter，不能只在模型提示里要求遵守权限。</li></ul>
+            <div class="meta"><span class="tag">RAG</span><span class="tag">Metadata Filter</span></div>
+          </article>
+          <article class="tool">
+            <h3>Human-in-the-Loop 审批流</h3>
+            <p>设计文档强调高危工具必须人工确认。工程上可落到工单、SOAR、审批队列或 ChatOps。</p>
+            <ul><li>对应 SentinelGraph：Agent Tool Guardrails。</li><li>适合：发送邮件、写数据库、删除、转账、外部 Webhook。</li><li>注意：审批对象应包含工具名、参数、上下文和风险发现。</li></ul>
+            <div class="meta"><span class="tag">Approval</span><span class="tag">Audit</span></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="privacy">
+        <h2><small>03 / PRIVACY</small>隐私保护与数据安全</h2>
+        <p>用于处理 PII、Secret、成员推断、模型反演和隐私计算场景。</p>
+        <div class="grid">
+          <article class="tool">
+            <h3><a href="https://github.com/microsoft/presidio" target="_blank" rel="noreferrer">Microsoft Presidio</a></h3>
+            <p>PII 检测与匿名化框架，适合在请求发送给模型或第三方服务前做脱敏。</p>
+            <ul><li>对应 SentinelGraph：Data Protection、Prompt Sanitization。</li><li>适合：姓名、邮箱、手机号、证件号、地址等识别和替换。</li><li>注意：行业字段和中文实体通常需要自定义 recognizer。</li></ul>
+            <div class="meta"><span class="tag">PII</span><span class="tag">Masking</span></div>
+          </article>
+          <article class="tool">
+            <h3><a href="https://github.com/pytorch/opacus" target="_blank" rel="noreferrer">Opacus</a></h3>
+            <p>PyTorch 的差分隐私训练库，通过梯度裁剪和噪声降低成员推断风险。</p>
+            <ul><li>对应 SentinelGraph：模型训练治理参考。</li><li>适合：需要训练或微调模型的隐私敏感场景。</li><li>注意：会影响模型效果，需要隐私预算管理。</li></ul>
+            <div class="meta"><span class="tag">DP</span><span class="tag">PyTorch</span></div>
+          </article>
+          <article class="tool">
+            <h3><a href="https://github.com/tensorflow/privacy" target="_blank" rel="noreferrer">TensorFlow Privacy</a></h3>
+            <p>TensorFlow 生态的差分隐私训练工具。</p>
+            <ul><li>对应 SentinelGraph：模型训练安全评估。</li><li>适合：TensorFlow/Keras 训练栈。</li><li>注意：更适合训练阶段，不解决 RAG 运行时越权。</li></ul>
+            <div class="meta"><span class="tag">DP</span><span class="tag">TensorFlow</span></div>
+          </article>
+          <article class="tool">
+            <h3><a href="https://github.com/FederatedAI/FATE" target="_blank" rel="noreferrer">FATE</a> / <a href="https://flower.ai/" target="_blank" rel="noreferrer">Flower</a> / <a href="https://github.com/OpenMined/PySyft" target="_blank" rel="noreferrer">PySyft</a></h3>
+            <p>联邦学习相关框架，让数据尽量留在本地，只交换模型参数或安全计算结果。</p>
+            <ul><li>对应 SentinelGraph：高敏行业 AI 治理参考。</li><li>适合：金融、医疗、跨组织联合建模。</li><li>注意：工程复杂度高，通常不是 MVP 第一阶段。</li></ul>
+            <div class="meta"><span class="tag">Federated Learning</span></div>
+          </article>
+          <article class="tool">
+            <h3><a href="https://github.com/microsoft/SEAL" target="_blank" rel="noreferrer">Microsoft SEAL</a> / <a href="https://github.com/zama-ai/concrete-ml" target="_blank" rel="noreferrer">Zama Concrete-ML</a></h3>
+            <p>同态加密和隐私推理工具，适合极高敏数据场景。</p>
+            <ul><li>对应 SentinelGraph：隐私计算扩展方向。</li><li>适合：云端不可见明文的推理或计算。</li><li>注意：成本和限制较高，应按场景评估。</li></ul>
+            <div class="meta"><span class="tag">FHE</span><span class="tag">Encrypted ML</span></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="robustness">
+        <h2><small>04 / ROBUSTNESS</small>对抗鲁棒性与攻击评测</h2>
+        <p>用于算法层评测，比如对抗扰动、鲁棒性基准和模型安全测试。</p>
+        <div class="grid">
+          <article class="tool">
+            <h3><a href="https://github.com/Trusted-AI/adversarial-robustness-toolbox" target="_blank" rel="noreferrer">Adversarial Robustness Toolbox</a></h3>
+            <p>IBM / LF AI & Data 生态的对抗鲁棒性工具箱，支持多种攻击、防御和评测方法。</p>
+            <ul><li>对应 SentinelGraph：模型安全评测实验室。</li><li>适合：CV、NLP、表格模型的对抗测试。</li><li>注意：偏模型研发阶段，不是运行时网关。</li></ul>
+            <div class="meta"><span class="tag">Adversarial ML</span><span class="tag">Evaluation</span></div>
+          </article>
+          <article class="tool">
+            <h3><a href="https://github.com/cleverhans-lab/cleverhans" target="_blank" rel="noreferrer">CleverHans</a></h3>
+            <p>对抗样本与鲁棒性研究常用库，适合建立模型安全测试基线。</p>
+            <ul><li>对应 SentinelGraph：模型上线前评测。</li><li>适合：研究型或模型平台团队。</li><li>注意：需要和业务模型、数据集、攻击假设绑定。</li></ul>
+            <div class="meta"><span class="tag">Research</span><span class="tag">Robustness</span></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="alignment">
+        <h2><small>05 / ALIGNMENT</small>对齐训练与模型治理</h2>
+        <p>用于 RLHF、DPO、PPO、分布式对齐训练等模型研发阶段能力。它们和运行时护栏互补，不应互相替代。</p>
+        <div class="grid">
+          <article class="tool">
+            <h3><a href="https://github.com/huggingface/trl" target="_blank" rel="noreferrer">TRL</a></h3>
+            <p>Hugging Face 的 Transformer Reinforcement Learning 库，支持 DPO、PPO、RLHF 等训练流程。</p>
+            <ul><li>对应 SentinelGraph：模型治理与安全微调参考。</li><li>适合：企业自训或微调安全模型。</li><li>注意：训练后仍需要运行时审计和护栏。</li></ul>
+            <div class="meta"><span class="tag">DPO</span><span class="tag">RLHF</span></div>
+          </article>
+          <article class="tool">
+            <h3><a href="https://github.com/microsoft/DeepSpeedExamples/tree/master/applications/DeepSpeed-Chat" target="_blank" rel="noreferrer">DeepSpeed-Chat</a> / Ray Alignment</h3>
+            <p>大规模分布式对齐训练方向，适合千亿参数级模型训练和强化学习管线。</p>
+            <ul><li>对应 SentinelGraph：大型模型平台远期能力。</li><li>适合：有模型训练基础设施的团队。</li><li>注意：不适合作为产品 MVP 的第一依赖。</li></ul>
+            <div class="meta"><span class="tag">Distributed Training</span></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section warning" id="selection">
+        <h2><small>06 / SELECTION</small>落地选型建议</h2>
+        <p><b>MVP 优先级：</b>先做运行时网关、PII/Secret 脱敏、RAG metadata filter、工具审批和审计链。模型训练、联邦学习、同态加密和对抗训练属于后续能力，适合在客户场景明确后分阶段接入。</p>
+        <div class="grid">
+          <article class="tool">
+            <h3>第一阶段</h3>
+            <p>Presidio + 规则检测 + Llama Guard / NeMo Guardrails + SentinelGraph 审计。</p>
+            <div class="meta"><span class="tag">Gateway</span><span class="tag">Audit</span><span class="tag">MVP</span></div>
+          </article>
+          <article class="tool">
+            <h3>第二阶段</h3>
+            <p>接入 LangChain/LlamaIndex 编排，强化 RAG 权限过滤、工具审批和批量扫描。</p>
+            <div class="meta"><span class="tag">RAG</span><span class="tag">Agent</span><span class="tag">Approval</span></div>
+          </article>
+          <article class="tool">
+            <h3>第三阶段</h3>
+            <p>引入 ART、CleverHans、TRL、Opacus 等训练和评测工具，服务模型平台团队。</p>
+            <div class="meta"><span class="tag">Evaluation</span><span class="tag">Training</span></div>
+          </article>
+          <article class="tool">
+            <h3>高敏行业扩展</h3>
+            <p>按需评估 FATE、Flower、PySyft、SEAL、Concrete-ML 等隐私计算方案。</p>
+            <div class="meta"><span class="tag">Privacy</span><span class="tag">Advanced</span></div>
+          </article>
+        </div>
+      </section>
+
+      <footer>本页是基于 <code>design/security_for_ai.md</code> 和 <code>design/EnterpriseAIAgentAndRAGSecurityWhiteBook.md</code> 的开发参考，不替代各工具官方文档和安全评测。</footer>
+    </main>
+  </body>
+</html>

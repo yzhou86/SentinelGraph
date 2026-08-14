@@ -10,12 +10,18 @@ def test_project_guide_is_publicly_available_and_linked_from_the_console() -> No
 
     guide = client.get("/guide")
     console = client.get("/")
+    reference = client.get("/reference")
 
     assert guide.status_code == 200
     assert "项目文档" in guide.text
     assert "/integrations" in guide.text
+    assert 'href="/reference"' in guide.text
     assert console.status_code == 200
     assert 'href="/guide"' in console.text
+    assert 'href="/reference"' in console.text
+    assert reference.status_code == 200
+    assert "开发参考" in reference.text
+    assert "Llama Guard" in reference.text
 
 
 def test_readme_and_project_guide_cover_the_same_core_concepts() -> None:

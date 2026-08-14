@@ -18,7 +18,7 @@
   </head>
   <body>
     <main class="shell">
-      <nav><div class="brand">Sentinel <span>Graph</span> / Integration API</div><div class="nav-links"><a href="/">演示控制台</a><a href="/guide">项目文档</a><a href="/docs">OpenAPI / Swagger</a><a href="/openapi.json">OpenAPI JSON</a></div></nav>
+      <nav><div class="brand">Sentinel <span>Graph</span> / Integration API</div><div class="nav-links"><a href="/">演示控制台</a><a href="/guide">项目文档</a><a href="/reference">开发参考</a><a href="/docs">OpenAPI / Swagger</a><a href="/openapi.json">OpenAPI JSON</a></div></nav>
       <section class="hero"><div class="eyebrow">VERSIONED REST API · OCSF · STARROCKS</div><h1>让第三方系统<br /><em>可靠地接入安全图谱。</em></h1><p class="lead">使用稳定的 <code>/v1</code> REST 接口接入 OCSF 日志、读取有界攻击图、执行检测、触发证据化 Agent 调查，并将安全报告补充为可审核的文本关系。</p></section>
       <aside class="notice"><b>安全边界</b><span>设置 <code>INTEGRATION_API_KEYS</code> 后，全部 <code>/v1</code> 接口要求 <code>X-API-Key</code>。密钥为空时仅适合本地开发；生产环境还应使用 HTTPS、API Gateway、限流、租户鉴权与审计。</span></aside>
       <section class="flow"><article><small>01 / INGEST</small><b>规范化与写入</b><p>直接提交 OCSF，或通过 ECS、CloudTrail、Zeek、JSON 适配器映射后写入 StarRocks。</p></article><article><small>02 / CORRELATE</small><b>受限图与检测</b><p>读取按租户和跳数限制的邻域，运行规则并获取带证据 ID 的告警。</p></article><article><small>03 / REASON</small><b>证据化调用</b><p>向 Agent 调查或文本图谱接口提交问题与报告；模型建议始终保留审核状态。</p></article></section>
